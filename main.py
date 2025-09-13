@@ -153,26 +153,6 @@ def run_agent(user_input: str) -> str:
 
 
 # Example usage
-if __name__ == "__main__":
-    # Test the agent with different types of queries
-
-    print("=== LangGraph Agent with Ollama Demo ===\n")
-
-    # Example 1: Simple calculation
-    response1 = run_agent("What is 15 * 8 + 32?")
-    print(f"Final response: {response1}\n")
-
-    # Example 2: Using the add_numbers tool
-    response2 = run_agent("Can you add 25.5 and 17.3 for me?")
-    print(f"Final response: {response2}\n")
-
-    # Example 3: Complex calculation
-    response3 = run_agent("Calculate the result of (100 - 25) * 3 / 5")
-    print(f"Final response: {response3}\n")
-
-    # Example 4: Regular conversation (no tools needed)
-    response4 = run_agent("Hello! How are you today?")
-    print(f"Final response: {response4}\n")
 
 
 # Interactive mode function
@@ -195,3 +175,26 @@ def interactive_mode():
 
 # Uncomment the line below to run in interactive mode
 # interactive_mode()
+
+if __name__ == "__main__":
+    # Test the agent with different types of queries
+
+    print("=== LangGraph Agent with Ollama Demo ===\n")
+
+    interactive_mode()
+    #
+    # # Example 1: Simple calculation
+    # response1 = run_agent("What is 15 * 8 + 32?")
+    # print(f"Final response: {response1}\n")
+    #
+    # # Example 2: Using the add_numbers tool
+    # response2 = run_agent("Can you add 25.5 and 17.3 for me?")
+    # print(f"Final response: {response2}\n")
+    #
+    # # Example 3: Complex calculation
+    # response3 = run_agent("Calculate the result of (100 - 25) * 3 / 5")
+    # print(f"Final response: {response3}\n")
+    #
+    # # Example 4: Regular conversation (no tools needed)
+    # response4 = run_agent("Hello! How are you today?")
+    # print(f"Final response: {response4}\n")
