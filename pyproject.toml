@@ -1,0 +1,10 @@
+[project]
+name = "langgraph-playground"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.12"
+dependencies = [
+    "langchain-core>=0.3.76",
+    "langchain-ollama>=0.3.8",
+    "langgraph>=0.6.7",
+]
