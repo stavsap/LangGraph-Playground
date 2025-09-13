@@ -11,7 +11,6 @@ Requirements:
 pip install langgraph langchain-ollama langchain-core
 """
 
-import json
 import operator
 from typing import Annotated, TypedDict, Literal
 from langchain_core.messages import BaseMessage, HumanMessage, AIMessage, ToolMessage
@@ -125,12 +124,14 @@ app = workflow.compile()
 
 
 def run_agent(user_input: str) -> str:
-    """Run the agent with a user input and return the final response."""
-    initial_state = {"messages": [HumanMessage(content=user_input)]}
+    """Run the agent with a user input and return the final response, including tool results if used."""
+    initial_state: AgentState = {"messages": [HumanMessage(content=user_input)]}
 
     print(f"User: {user_input}")
     print("-" * 50)
 
+    tool_results = []
+    tool_names = []
     # Run the agent
     for output in app.stream(initial_state):
         for key, value in output.items():
@@ -138,6 +139,7 @@ def run_agent(user_input: str) -> str:
                 message = value["messages"][-1]
                 if hasattr(message, 'tool_calls') and message.tool_calls:
                     print(f"Agent is calling tools: {[tc['name'] for tc in message.tool_calls]}")
+                    tool_names.extend([tc['name'] for tc in message.tool_calls])
                 else:
                     print(f"Agent: {message.content}")
             elif key == "tools":
@@ -145,21 +147,30 @@ def run_agent(user_input: str) -> str:
                 for msg in tool_messages:
                     if isinstance(msg, ToolMessage):
                         print(f"Tool result: {msg.content}")
+                        tool_results.append(msg.content)
         print("-" * 30)
 
     # Get the final state to return the last message
     final_state = app.invoke(initial_state)
-    return final_state["messages"][-1].content
-
-
-# Example usage
+    final_message = final_state["messages"][-1].content
+    if tool_results:
+        explanation = "\n\nHere are the results from the tools I used to answer your question:"\
+            + "\n".join([f"- {name}: {result}" for name, result in zip(tool_names, tool_results)])
+        referenced_results = [result for result in tool_results if str(result) in final_message]
+        if referenced_results:
+            explanation += "\n\nExplanation of referenced results:" + " ".join([f"The result '{result}' was produced by the tool '{name}' and is referenced in my answer above." for name, result in zip(tool_names, tool_results) if result in referenced_results])
+        else:
+            explanation += "\n(These results were used in my reasoning above, even if not shown directly in the answer.)"
+        return f"{final_message}{explanation}"
+    return final_message
 
 
 # Interactive mode function
 def interactive_mode():
-    """Run the agent in interactive mode."""
-    print("=== Interactive Mode ===")
-    print("Type 'quit' to exit\n")
+    """Run the agent in interactive mode, allowing the user to have a conversation."""
+    print("Welcome to the LangGraph Agent with Ollama interactive demo!")
+    print("You can ask me to perform calculations or add numbers.")
+    print("Type 'exit' or 'quit' to end the conversation.\n")
 
     while True:
         user_input = input("You: ")
@@ -172,6 +183,7 @@ def interactive_mode():
             print(f"\nFinal response: {response}\n")
         except Exception as e:
             print(f"Error: {e}\n")
+
 
 # Uncomment the line below to run in interactive mode
 # interactive_mode()
